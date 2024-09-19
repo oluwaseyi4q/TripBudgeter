@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"com-tripbudgeter","appId":"1:59778575468:android:630a8bfb595fb9081bfc49","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"com-tripbudgeter","configurations":{"android":"1:59778575468:android:630a8bfb595fb9081bfc49","ios":"1:59778575468:ios:dd23e8dd02a7a67f1bfc49"}}}}}}
