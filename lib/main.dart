@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tripbudgeter/screens/login_screen.dart';
 import 'package:tripbudgeter/screens/onboarding_screen.dart';
 import 'package:tripbudgeter/screens/sign_up.dart';
+import 'package:tripbudgeter/screens/users_screens/trip_screen.dart';
 import 'package:tripbudgeter/screens/users_screens/user_edit_screen.dart';
 import 'firebase_options.dart';
 
@@ -25,7 +26,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home:  OnboardingPage(),
+      home: OnboardingPage(),
       navigatorKey: navKey,
     );
   }

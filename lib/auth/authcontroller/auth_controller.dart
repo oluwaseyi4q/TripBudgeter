@@ -155,4 +155,48 @@ class AuthController {
 
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
+
+
+  // FORGOT PASSWORD IMPLEMENTATION
+  Future<void> handleForgotPassword(WidgetRef ref, String email) async {
+    try {
+      // Send password reset email
+      await _auth.sendPasswordResetEmail(email: email);
+
+
+      // Show success message
+      ScaffoldMessenger.of(navKey.currentContext!).showSnackBar(
+        const SnackBar(
+          behavior: SnackBarBehavior.floating,
+          width: 300,
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          content: Text('Password reset email sent!'),
+        ),
+      );
+      navKey.currentState!.pushReplacement(
+          MaterialPageRoute(builder: (_) => const LoginScreen()));
+    } on FirebaseAuthException catch (error) {
+      ScaffoldMessenger.of(navKey.currentContext!).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          width: 300,
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+          content: Text(error.message ?? 'An error occurred'),
+        ),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(navKey.currentContext!).showSnackBar(
+        const SnackBar(
+          behavior: SnackBarBehavior.floating,
+          width: 300,
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+          content: Text('An unexpected error occurred'),
+        ),
+      );
+    }
+  }
+
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tripbudgeter/screens/users_screens/user_profile_screen.dart';
 
 import 'login_screen.dart';
 
@@ -31,7 +32,7 @@ class HeaderWidget extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
+              MaterialPageRoute(builder: (context) => const UserProfilePage()),
             );
           },
           child: Text(

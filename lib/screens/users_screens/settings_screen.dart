@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../login_screen.dart';
 import 'help.dart';
 
-class Settings extends StatelessWidget {
+class Settings_Screen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

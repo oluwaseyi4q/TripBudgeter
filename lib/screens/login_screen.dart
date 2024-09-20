@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tripbudgeter/screens/sign_up.dart';
+import 'package:tripbudgeter/screens/users_screens/after_logIn.dart';
+import 'package:tripbudgeter/screens/users_screens/forgetpassword.dart';
 import 'package:tripbudgeter/screens/users_screens/home_screen.dart';
 
 import '../auth/authcontroller/auth_controller.dart';
@@ -77,7 +79,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             } else {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomePage()),
+                MaterialPageRoute(builder: (context) => AfterLogin()),
               );
             }
           } else {
@@ -236,8 +238,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Align(
                             alignment: Alignment.centerRight,
                             child: TextButton(
-                              onPressed: () {},
-                              child: const Text('Forget Password?'),
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                                );
+                              },
+                              child: const Text('Forget Password?',style:TextStyle(color: Colors.blue)),
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -308,7 +314,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             );
                           },
-                          child: const Text('Create One'),
+                          child: const Text('Create One',style:TextStyle(color: Colors.blue)),
                         ),
                       ],
                     ),

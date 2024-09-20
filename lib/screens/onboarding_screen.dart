@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tripbudgeter/screens/users_screens/first.dart';
 import 'package:tripbudgeter/screens/users_screens/home_screen.dart';
 
 import 'login_screen.dart';
@@ -36,7 +37,7 @@ class _OnboardingPageState extends State<OnboardingPage>
       } else if (status == AnimationStatus.dismissed) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => const First()),
         );
       }
     });
