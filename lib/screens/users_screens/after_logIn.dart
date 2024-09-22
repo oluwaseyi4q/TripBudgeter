@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:tripbudgeter/screens/users_screens/notification_screen.dart';
 import 'package:tripbudgeter/screens/users_screens/settings_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tripbudgeter/screens/users_screens/trip_screen.dart';
 
 import '../header_widget.dart';
+
 
 class AfterLogin extends StatefulWidget {
   const AfterLogin({super.key});
@@ -19,6 +21,8 @@ class _AfterLoginState extends State<AfterLogin> {
 
   Map<String, dynamic>? userData;
   bool isLoading = true;
+  int _currentIndex = 0; // Track the current page index
+  final PageController _pageController = PageController(); // PageController
 
   @override
   void initState() {
@@ -29,7 +33,8 @@ class _AfterLoginState extends State<AfterLogin> {
   Future<void> _loadUserData() async {
     try {
       var userId = _auth.currentUser!.uid;
-      DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(userId).get();
       if (userDoc.exists) {
         setState(() {
           userData = userDoc.data() as Map<String, dynamic>;
@@ -46,13 +51,14 @@ class _AfterLoginState extends State<AfterLogin> {
     }
   }
 
-  void _showTripForm() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return TripForm();
-      },
-    );
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  void _onNavTapped(int index) {
+    _pageController.jumpToPage(index); // Navigate to the selected page
   }
 
   @override
@@ -64,141 +70,132 @@ class _AfterLoginState extends State<AfterLogin> {
         title: isLoading
             ? const CircularProgressIndicator() // Show a loading indicator
             : userData == null
-            ? const Text('No user data available')
-            : HeaderWidget(
-          userName: 'Hi, ${userData!['username']}',
-          imagePath: userData!['profileImage'] == null ||
-              userData!['profileImage'].isEmpty
-              ? 'assets/default_profile.png' // Default image path
-              : userData!['profileImage'],
-          onMoreOptions: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>  Settings_Screen()),
-            );
-          },
-        ),
+                ? const Text('No user data available')
+                : HeaderWidget(
+                    userName: 'Hi, ${userData!['username']}',
+                    imagePath: userData!['profileImage'] == null ||
+                            userData!['profileImage'].isEmpty
+                        ? 'assets/default_profile.png' // Default image path
+                        : userData!['profileImage'],
+                    onMoreOptions: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SettingScreen()),
+                      );
+                    },
+                    onNotification:(){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const NotificationScreen()),
+                      );
+                    } ,
+                  ),
         backgroundColor: const Color.fromARGB(255, 4, 120, 228),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            const Text('Add Trips',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                )),
-            const SizedBox(height: 2),
-            Text(
-              'Explore Different Places With Managed Expenses',
-              style: GoogleFonts.dancingScript(
-                fontSize: 20,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Wrap(
-              spacing: 15,
-              runSpacing: 20,
-              children: [
-                GestureDetector(
-                  onTap: _showTripForm,
-                  child: Container(
-                    width: double.infinity,
-                    height: 130,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 209, 209, 209),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.add,
-                        size: 48,
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        children: [
+          // Your home page content
+          const Center(child: Text('Add trips to start budgeting')),
+          // The add trip page content
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Text(
+                        'Add New Trips',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const TripsScreen()));
+                        },
+                        child: const Text(
+                          'Active trips >',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  // Search Bar
+                  const TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Search Trips',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.search),
                     ),
                   ),
-                )
-              ],
-            ),
-            const SizedBox(height: 40),
-            const Text(
-              'Active Trips',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+                  const SizedBox(height: 10),
+
+                  // Sort and Filter Options
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Sort Dropdown
+                      DropdownButton<String>(
+                        hint: const Text('Sort by'),
+                        items: <String>['Date', 'Destination', 'Budget']
+                            .map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          // Handle sort selection
+                        },
+                      ),
+                      // Filter Dropdown
+                      DropdownButton<String>(
+                        hint: const Text('Filter'),
+                        items: <String>['All', 'Upcoming', 'Past']
+                            .map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          // Handle filter selection
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
-          ],
-        ),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _onNavTapped,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class TripForm extends StatelessWidget {
-  final TextEditingController locationController = TextEditingController();
-  final TextEditingController dateController = TextEditingController();
-  final TextEditingController notesController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: locationController,
-            decoration: const InputDecoration(labelText: 'Location'),
-          ),
-          TextField(
-            controller: dateController,
-            decoration: const InputDecoration(labelText: 'Date'),
-            keyboardType: TextInputType.datetime,
-          ),
-          TextField(
-            controller: notesController,
-            decoration: const InputDecoration(labelText: 'Notes'),
-            maxLines: 3,
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Handle saving the trip
-                  Navigator.pop(context);
-                },
-                child: const Text('Save Trip'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Cancel'),
-              ),
-            ],
+            icon: Icon(Icons.add),
+            label: 'Add Trips',
           ),
         ],
       ),

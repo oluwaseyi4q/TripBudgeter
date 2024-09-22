@@ -4,12 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tripbudgeter/screens/sign_up.dart';
 import 'package:tripbudgeter/screens/users_screens/after_logIn.dart';
 import 'package:tripbudgeter/screens/users_screens/forgetpassword.dart';
-import 'package:tripbudgeter/screens/users_screens/home_screen.dart';
 
 import '../auth/authcontroller/auth_controller.dart';
 import '../auth/authcontroller/login_provider/login_provider.dart';
 import 'admin_screens/admin_screen.dart';
-import 'users_screens/contact_us.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -32,6 +30,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   final formKey = GlobalKey<FormState>();
 
+   bool isLoading = false; // Add this variable to track loading state
+
   @override
   void initState() {
     _controller = AuthController();
@@ -51,6 +51,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
 
+// Set loading to true
+      setState(() {
+        isLoading = true;
+      });
       ref.watch(LoginNotifierProvider.notifier).emailChange(emailController.text);
       ref.watch(LoginNotifierProvider.notifier).passwordChange(passwordController.text);
 
@@ -74,7 +78,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             if (role == 'admin') {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => AdminDashboard()),
+                MaterialPageRoute(builder: (context) => Admin()),
               );
             } else {
               Navigator.pushReplacement(
@@ -288,13 +292,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             width: double.infinity,
                             child: FilledButton(
                               style: FilledButton.styleFrom(
-                                backgroundColor:
-                                const Color.fromARGB(255, 4, 120, 228),
+                                backgroundColor: const Color.fromARGB(255, 4, 120, 228),
                                 padding: const EdgeInsets.symmetric(vertical: 18),
                                 textStyle: GoogleFonts.poppins(fontSize: 18),
                               ),
-                              onPressed: login,
-                              child: const Text("Log in"),
+                              onPressed: isLoading ? null : login, // Disable button while loading
+                              child: isLoading
+                                  ? const SizedBox(
+                                      height: 18,
+                                      width: 18,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Text("Log in"),
                             ),
                           ),
                         ],

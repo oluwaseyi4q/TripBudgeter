@@ -16,7 +16,7 @@ class First extends StatelessWidget {
             color: const Color.fromARGB(255, 4, 120, 228),
             width: double.infinity,
             height: 500,
-            child: Image.asset('assets/image9.gif'),
+            child: Image.asset('assets/Travelers.gif'),
           ),
           const SizedBox(
             height: 20,

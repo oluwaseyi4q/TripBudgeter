@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tripbudgeter/screens/login_screen.dart';
 import '../card_widget.dart';
-import '../header_widget.dart'; // Import your header widget
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -19,6 +19,9 @@ class HomePage extends StatelessWidget {
           onMoreOptions: () {
             // Add action for the button here
           },
+          onNotification: (){
+            
+          },
         ),
         backgroundColor: const Color.fromARGB(255, 4, 120, 228),
       ),
@@ -30,7 +33,7 @@ class HomePage extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            const Text('Available Trips',
+            const Text('Active Trips',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -98,12 +101,8 @@ class HomePage extends StatelessWidget {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.add),
+            label: 'Add trip',
           ),
         ],
       ),
@@ -148,3 +147,73 @@ Widget _buildCategoryBox(IconData icon, String label) {
     ],
   );
 }
+
+
+
+
+class HeaderWidget extends StatelessWidget {
+  final String userName;
+  final String imagePath;
+  final VoidCallback onMoreOptions;
+  final VoidCallback onNotification;
+
+  const HeaderWidget({
+    super.key,
+    required this.userName,
+    required this.imagePath,
+    required this.onMoreOptions,
+    required this.onNotification,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        ClipOval(
+          child: Image.asset(
+            imagePath,
+            height: 50,
+            width: 50,
+            fit: BoxFit.cover,
+          ),
+        ),
+        const SizedBox(width: 10),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+            );
+          },
+          child: Text(
+            userName,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+            ),
+          ),
+        ),
+        const Spacer(),
+        IconButton(
+          icon: const Icon(
+            Icons.notifications,
+            color: Colors.white,
+            size: 30,
+          ),
+          onPressed: onNotification ,
+        ),
+        const SizedBox(
+          width: 10,
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.menu,
+            color: Colors.white,
+          ),
+          onPressed: onMoreOptions,
+        ),
+      ],
+    );
+  }
+}
+

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:tripbudgeter/screens/users_screens/user_profile_screen.dart';
 
-import 'login_screen.dart';
-
 class HeaderWidget extends StatelessWidget {
   final String userName;
   final String imagePath;
   final VoidCallback onMoreOptions;
+  final VoidCallback onNotification;
 
   const HeaderWidget({
-    Key? key,
+    super.key,
     required this.userName,
     required this.imagePath,
     required this.onMoreOptions,
-  }) : super(key: key);
+    required this.onNotification,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +46,20 @@ class HeaderWidget extends StatelessWidget {
         const Spacer(),
         IconButton(
           icon: const Icon(
-            Icons.view_list_sharp,
+            Icons.notifications,
             color: Colors.white,
+            size: 30,
+          ),
+          onPressed: onNotification ,
+        ),
+        const SizedBox(
+          width: 10,
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.menu_rounded,
+            color: Colors.white,
+            size: 30,
           ),
           onPressed: onMoreOptions,
         ),

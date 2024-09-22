@@ -46,7 +46,7 @@ class AuthController {
       // Navigate based on user role
       if (role == 'admin') {
         navKey.currentState!.pushReplacement(
-            MaterialPageRoute(builder: (_) => AdminDashboard()));
+            MaterialPageRoute(builder: (_) => Admin()));
       } else if (role == 'user') {
         navKey.currentState!.pushReplacement(
             MaterialPageRoute(builder: (_) => HomePage()));

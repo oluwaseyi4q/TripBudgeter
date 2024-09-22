@@ -24,6 +24,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   late AuthController _controller;
 
   final formKey = GlobalKey<FormState>();
+   bool isLoading = false; // Add this variable to track loading state
 
   @override
   void initState() {
@@ -49,6 +50,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   //Register function
   void register() {
     // validateForm();
+    // Set loading to true
+      setState(() {
+        isLoading = true;
+      });
     ref
         .watch(registerNotifierProvider.notifier)
         .emailChange(emailController.text);
@@ -64,6 +69,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         .fullnameChange(fullnameController.text);
 
     _controller.handleRegisterWithEmailAndPassword(ref);
+
+    
   }
 
   void validateForm() {
@@ -244,20 +251,26 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     const SizedBox(height: 20),
                     SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 4, 120, 228),
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          textStyle: GoogleFonts.poppins(fontSize: 18),
-                        ),
-                        onPressed: () {
-                          register();
-                        },
-                        child: const Text("Create Account"),
-                      ),
-                    ),
+                            width: double.infinity,
+                            child: FilledButton(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(255, 4, 120, 228),
+                                padding: const EdgeInsets.symmetric(vertical: 18),
+                                textStyle: GoogleFonts.poppins(fontSize: 18),
+                              ),
+                              onPressed: isLoading ? null : register, // Disable button while loading
+                              child: isLoading
+                                  ? const SizedBox(
+                                      height: 18,
+                                      width: 18,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Text("Create Account"),
+                            ),
+                          ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

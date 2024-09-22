@@ -45,6 +45,10 @@ dependencies:
   cloud_firestore: ^5.0.0
   firebase_storage: ^12.3.1
   image_picker: ^1.1.2
+  geolocator: ^9.0.2
+  geocoding: ^2.0.0
+  google_places_flutter: ^2.0.9
+  flutter_typeahead: ^5.2.0
 
 dev_dependencies:
   flutter_test:
@@ -71,7 +75,6 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
      - assets/
-     - assets/image9.gif
      - assets/default_profile.png
   #   - images/a_dot_ham.jpeg
 

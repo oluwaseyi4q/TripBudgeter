@@ -4,9 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+
 
 class UserProfileEditPage extends StatefulWidget {
-  final Map<String, dynamic>? userData; // Pass user data from login
+  final Map<String, dynamic>? userData;
 
   const UserProfileEditPage({super.key, this.userData});
 
@@ -36,7 +39,6 @@ class _UserProfileEditPageState extends State<UserProfileEditPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize profile data from the passed user data
     if (widget.userData != null) {
       fullname = widget.userData!['fullname'] ?? '';
       username = widget.userData!['username'] ?? '';
@@ -67,10 +69,8 @@ class _UserProfileEditPageState extends State<UserProfileEditPage> {
       final storageRef = _storage.ref().child('profile_pictures/$userId.jpg');
       await storageRef.putFile(_profileImage!);
 
-      // Get the download URL
       final downloadUrl = await storageRef.getDownloadURL();
 
-      // Update the profile image URL in Firestore
       await _firestore.collection('users').doc(userId).update({
         'profileImage': downloadUrl,
       });
@@ -111,6 +111,31 @@ class _UserProfileEditPageState extends State<UserProfileEditPage> {
     }
   }
 
+  // Function to get current location
+  Future<void> _getCurrentLocation() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      return; // Permission denied, handle it gracefully
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude, position.longitude);
+
+    if (placemarks.isNotEmpty) {
+      Placemark place = placemarks[0];
+      String currentAddress =
+          '${place.locality}, ${place.administrativeArea}, ${place.country}';
+
+      setState(() {
+        address = currentAddress;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,7 +147,6 @@ class _UserProfileEditPageState extends State<UserProfileEditPage> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // Profile Picture
                 GestureDetector(
                   onTap: _pickImage,
                   child: CircleAvatar(
@@ -131,10 +155,8 @@ class _UserProfileEditPageState extends State<UserProfileEditPage> {
                         ? NetworkImage(profileImageUrl!)
                         : (_profileImage != null
                         ? FileImage(_profileImage!)
-                        : AssetImage('assets/default_profile.png'))
-                    as ImageProvider,
-                    child: Icon(
-                        Icons.camera_alt, size: 30, color: Colors.white),
+                        : AssetImage('assets/default_profile.png')) as ImageProvider,
+                    child: Icon(Icons.camera_alt, size: 30, color: Colors.white),
                   ),
                 ),
                 SizedBox(height: 10),
@@ -163,7 +185,13 @@ class _UserProfileEditPageState extends State<UserProfileEditPage> {
                 ),
                 TextFormField(
                   initialValue: address,
-                  decoration: InputDecoration(labelText: 'Address'),
+                  decoration: InputDecoration(
+                    labelText: 'Address',
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.location_on),
+                      onPressed: _getCurrentLocation, // Call location function
+                    ),
+                  ),
                   onSaved: (value) {
                     address = value!;
                   },
@@ -177,11 +205,12 @@ class _UserProfileEditPageState extends State<UserProfileEditPage> {
                 ),
                 DropdownButtonFormField<String>(
                   value: gender,
-                  items: ['Male', 'Female', 'Other'].map((label) =>
-                      DropdownMenuItem(
-                        child: Text(label),
-                        value: label,
-                      )).toList(),
+                  items: ['Male', 'Female', 'Other']
+                      .map((label) => DropdownMenuItem(
+                    child: Text(label),
+                    value: label,
+                  ))
+                      .toList(),
                   onChanged: (value) {
                     setState(() {
                       gender = value!;
@@ -190,11 +219,12 @@ class _UserProfileEditPageState extends State<UserProfileEditPage> {
                 ),
                 DropdownButtonFormField<String>(
                   value: preferredCurrency,
-                  items: ['USD', 'EUR', 'GBP', 'NGN', 'JPY'].map((label) =>
-                      DropdownMenuItem(
-                        child: Text(label),
-                        value: label,
-                      )).toList(),
+                  items: ['USD', 'EUR', 'GBP', 'NGN', 'JPY']
+                      .map((label) => DropdownMenuItem(
+                    child: Text(label),
+                    value: label,
+                  ))
+                      .toList(),
                   onChanged: (value) {
                     setState(() {
                       preferredCurrency = value!;
